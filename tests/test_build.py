@@ -100,3 +100,21 @@ def test_no_null_team_names(con):
 def test_every_match_has_a_k_factor(con):
     n = con.sql("SELECT count(*) FROM matches WHERE k_factor IS NULL").fetchone()[0]
     assert n == 0
+
+
+def test_every_tier_key_matches_a_real_tournament(con):
+    """A key that matches nothing is a silent misclassification: the tournament
+    it was meant for falls through to the default tier. 'CONCACAF Gold Cup' did
+    exactly that — the data calls it 'Gold Cup'."""
+    from football_agent.data.tournaments import _CONTINENTAL, _NATIONS_LEAGUE, _WORLD_CUP, _fold
+
+    names = [_fold(r[0]) for r in con.sql("SELECT DISTINCT tournament FROM matches").fetchall()]
+    dead = [
+        k for k in (*_CONTINENTAL, _WORLD_CUP, _NATIONS_LEAGUE) if not any(k in n for n in names)
+    ]
+    assert dead == []
+
+
+def test_gold_cup_is_continental(con):
+    tier = con.sql("SELECT any_value(tournament_tier) FROM matches WHERE tournament = 'Gold Cup'")
+    assert tier.fetchone()[0] == "continental"
