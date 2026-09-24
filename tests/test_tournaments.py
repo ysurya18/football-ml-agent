@@ -21,7 +21,7 @@ class TestQualifiersAreNotFinals:
             "African Cup of Nations qualification",
             "AFC Asian Cup qualification",
             "Oceania Nations Cup qualification",
-            "CONCACAF Gold Cup qualification",
+            "Gold Cup qualification",
         ],
     )
     def test_qualifier_beats_the_competition_it_qualifies_for(self, tournament):
@@ -48,6 +48,18 @@ class TestAccentedNames:
         assert classify("Copa América qualification") == "qualifier"
 
 
+class TestGoldCup:
+    """Upstream's key was 'CONCACAF Gold Cup'; the data says 'Gold Cup', so the
+    key never matched and 420 finals matches were graded as qualifiers."""
+
+    def test_gold_cup_as_named_in_the_data(self):
+        assert classify("Gold Cup") == "continental"
+        assert k_factor("Gold Cup") == 50
+
+    def test_gold_cup_qualifier_still_a_qualifier(self):
+        assert classify("Gold Cup qualification") == "qualifier"
+
+
 class TestTiers:
     @pytest.mark.parametrize(
         "tournament,tier",
@@ -56,7 +68,6 @@ class TestTiers:
             ("UEFA Euro", "continental"),
             ("African Cup of Nations", "continental"),
             ("AFC Asian Cup", "continental"),
-            ("CONCACAF Gold Cup", "continental"),
             ("Confederations Cup", "continental"),
             ("UEFA Nations League", "qualifier"),
             ("CECAFA Cup", "qualifier"),

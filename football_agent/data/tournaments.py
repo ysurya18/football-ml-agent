@@ -16,7 +16,13 @@ This is a corrected reimplementation of `FootballElo.classify_tournament` in
    fall through to the default tier instead of being graded as a continental
    championship.
 
-Both are fixed here: specificity-ordered tests, over accent-folded names.
+3. **Dead key.** The dictionary key is "CONCACAF Gold Cup" but the data says
+   "Gold Cup", so all 420 Gold Cup finals matches were graded as qualifiers
+   (K=40). Every key below is now checked against the data by
+   tests/test_build.py::test_every_tier_key_matches_a_real_tournament.
+
+All three are fixed here: specificity-ordered tests, over accent-folded names,
+with keys taken from the data rather than from memory.
 """
 
 from __future__ import annotations
@@ -38,7 +44,7 @@ _CONTINENTAL = (
     "uefa euro",
     "african cup of nations",
     "afc asian cup",
-    "concacaf gold cup",
+    "gold cup",
     "oceania nations cup",
     "confederations cup",
 )
