@@ -23,9 +23,9 @@ without a reason:
 
 | | |
 |---|---|
-| Done | Scaffold, licensing, DuckDB loader, tournament tiers, 32 tests |
-| Next | Feature pipeline (92 features, chronological replay, scenario overrides) |
-| Then | XGBoost training + calibration check → tool layer → Claude agent → FastAPI |
+| Done | Scaffold, licensing, DuckDB loader, tournament tiers, feature pipeline, 83 tests |
+| Next | XGBoost training + calibration check, measured against the Elo-only baseline |
+| Then | Tool layer → Claude agent → FastAPI |
 
 Roadmap checkboxes live in `README.md`.
 
@@ -39,6 +39,10 @@ Roadmap checkboxes live in `README.md`.
   genuine held-out validation set — results the model has never seen in any form.
 - **The majority-class baseline is 48.4%, not 33%.** From 1990: home 48.4%, draw 23.5%,
   away 28.0%. Always report accuracy against 48.4%.
+- **The Elo favourite alone scores 60.5% on 2020+.** Predicting home win when
+  `home_expected > 0.5`, else away win — one feature, no model. That, not 48.4%, is the
+  bar the trained model has to clear to justify the other 91 features. (Majority class
+  over 2020+ alone is 47.4%.)
 - **Expect ~60%, and no more than 62-65%.** Draws are near-irreducible; team sheets, red
   cards and weather are not in the data. A model claiming much more has leaked something.
 
@@ -54,6 +58,17 @@ Regression tests in `tests/test_tournaments.py`.
    the `if` statements in `classify()` *is* the fix.
 2. **Accents.** The key is `"Copa America"`; the data says `"Copa América"`. Names are now
    accent-folded before matching.
+
+## The feature pipeline
+
+`football_agent/features/`. `FeatureState.features(home, away, ctx)` is pure and
+`update()` applies a result; the replay reads, records, then updates. Training rows and
+live predictions go through the same `features()` call, and a scenario is just a
+different `MatchContext`. Column names and order match upstream's `ALL_FEATURES`
+exactly (tested). 76 of 92 features are numerically identical to upstream; the other 16
+differ only where upstream defects were fixed — own goals, missing-data comebacks,
+Poisson cache/truncation, accented cities, confederation coverage, stage substrings.
+Each has a regression test in `tests/test_features.py`.
 
 ## Conventions
 
@@ -74,7 +89,8 @@ Regression tests in `tests/test_tournaments.py`.
 ```bash
 uv sync                                        # install
 uv run python -m football_agent.data.build     # build football.duckdb from the CSVs
-uv run pytest -q                               # 32 tests
+uv run python -m football_agent.features.build # replay matches -> `features` table (~5s)
+uv run pytest -q                               # 83 tests
 uv run ruff check . && uv run ruff format .    # lint, format
 ```
 
