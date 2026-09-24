@@ -87,8 +87,8 @@ uv run python -m football_agent.cli           # chat
 ## Roadmap
 
 - [x] Project scaffold, data, licensing
-- [ ] DuckDB loader
-- [ ] Feature pipeline — 92 features, chronological replay, scenario overrides
+- [x] DuckDB loader
+- [x] Feature pipeline — 92 features, chronological replay, scenario overrides
 - [ ] XGBoost training with time-based split and a calibration check
 - [ ] Tool layer with unit tests
 - [ ] Claude tool-use agent + CLI
