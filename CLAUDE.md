@@ -23,7 +23,7 @@ without a reason:
 
 | | |
 |---|---|
-| Done | Scaffold, licensing, DuckDB loader, tournament tiers, feature pipeline, 83 tests |
+| Done | Scaffold, licensing, DuckDB loader, tournament tiers, feature pipeline, 86 tests |
 | Next | XGBoost training + calibration check, measured against the Elo-only baseline |
 | Then | Tool layer → Claude agent → FastAPI |
 
@@ -90,7 +90,7 @@ Each has a regression test in `tests/test_features.py`.
 uv sync                                        # install
 uv run python -m football_agent.data.build     # build football.duckdb from the CSVs
 uv run python -m football_agent.features.build # replay matches -> `features` table (~5s)
-uv run pytest -q                               # 83 tests
+uv run pytest -q                               # 86 tests
 uv run ruff check . && uv run ruff format .    # lint, format
 ```
 
